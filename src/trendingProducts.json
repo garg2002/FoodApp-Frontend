@@ -1,0 +1,87 @@
+[
+  {
+    "name": "Chicken Tikka Masala",
+    "price": 12.99,
+    "description": "Marinated chicken cooked in a rich tomato sauce",
+    "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "offer": "10% off on orders above $50",
+    "review": "4.5/5 stars, 200+ reviews"
+  },
+  {
+    "name": "Palak Paneer",
+    "price": 10.99,
+    "description": "Creamy spinach curry with Indian cheese",
+    "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "offer": "Free delivery on orders above $20",
+    "review": "4.2/5 stars, 150+ reviews"
+  },
+  {
+    "name": "Samosas",
+    "price": 6.99,
+    "description": "Crispy fried or baked pastries filled with spiced potatoes",
+    "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "offer": "Buy 2 get 1 free",
+    "review": "4.8/5 stars, 100+ reviews"
+  },
+  {
+    "name": "Butter Chicken",
+    "price": 11.99,
+    "description": "Marinated chicken cooked in a rich buttery tomato sauce",
+        "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "offer": "15% off on orders above $75",
+    "review": "4.7/5 stars, 120+ reviews"
+  },
+  {
+    "name": "Naan Bread",
+    "price": 2.99,
+    "description": "Freshly baked Indian flatbread",
+    "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+   
+    "offer": "Buy 1 get 1 50% off",
+    "review": "4.9/5 stars, 80+ reviews"
+  },
+  {
+    "name": "Tandoori Chicken",
+    "price": 13.99,
+    "description": "Marinated chicken cooked in a clay oven",
+        "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "offer": "Free dessert on orders above $40",
+    "review": "4.6/5 stars, 90+ reviews"
+  },
+  {
+    "name": "Rogan Josh",
+    "price": 12.99,
+    "description": "Spicy lamb curry from the Kashmir region",
+        "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+
+    "offer": "10% off on orders above $30",
+    "review": "4.4/5 stars, 60+ reviews"
+  },
+  {
+    "name": "Gulab Jamun",
+    "price": 5.99,
+    "description": "Deep-fried dumplings soaked in sweet syrup",
+       "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+
+    "offer": "Buy 1 get 1 free",
+    "review": "4.9/5 stars, 50+ reviews"
+  },
+  {
+    "name": "Biryani",
+    "price": 9.99,
+    "description": "Mixed rice dish with spices and vegetables",
+        "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+
+    "offer": "Free drink on orders above $25",
+    "review": "4.5/5 stars, 70+ reviews"
+  },
+  {
+    "name": "Jalebi",
+    "price": 4.99,
+    "description": "Crispy fried batter soaked in sweet syrup",
+      "image_url": "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=600",
+
+    "offer": "Buy 2 get 1 50% off",
+    "review": "4.8/5 stars, 40+ reviews"
+  }
+]
