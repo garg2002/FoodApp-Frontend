@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export const productsData = createAsyncThunk("productsData", async () => {
-  const response = await fetch(`${backendUrl}/products/`);
+  const response = await fetch(`${backendUrl}/products/products/`);
   const data = await response.json();
   return data;
 });

@@ -31,7 +31,7 @@ const Carousel = () => {
                     <Link to={`/category/${item.id}`} key={item.id}>
                       <div className="min-w-[200px] bg-white flex cursor-pointer justify-center  items-center flex-col px-2 rounded-md transform transition-transform duration-300 hover:scale-90">
                         <img
-                          src={item.imageURL}
+                          src={item.image}
                           alt=""
                           className="w-32 h-36 md:w-36 rounded-full md:h-40 shadow-inherit"
                         />

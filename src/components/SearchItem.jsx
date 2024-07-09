@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 
 
@@ -8,6 +9,8 @@ const SearchItem = () => {
   
   const { products } = useSelector((state) => state.products);
   const SearchedData = products.filter((item) => item?.name.toLowerCase().includes(query.toLowerCase()));
+
+  console.log("SearchedData:----", SearchedData);
 
   return (
     <div className="w-full h-full py-4 ">
@@ -24,18 +27,20 @@ const SearchItem = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center w-full h-full">
           {SearchedData?.map((product) => {
             return (
-              <div
-                className=" md:w-[300px] w-[220px] cursor-pointer bg-white   shadow-stone-400 rounded-md"
-                key={product?.id}
-              >
-                <div className="w-full h-48">
-                  <img
-                    src={product.imageURL}
-                    alt=""
-                    className="object-contain rounded-xl w-[220px] md:w-[450px] h-48 "
-                  />
+              <Link to={`/category/${product.id}`} key={product.id}>
+                <div
+                  className=" md:w-[300px] w-[220px] cursor-pointer bg-white   shadow-stone-400 rounded-md"
+                  key={product?.id}
+                >
+                  <div className="w-full h-48">
+                    <img
+                      src={product.image}
+                      alt=""
+                      className="object-contain rounded-xl w-[220px] md:w-[450px] h-48 "
+                    />
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

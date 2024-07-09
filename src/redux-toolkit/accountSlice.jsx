@@ -15,8 +15,11 @@ export const loginUser = createAsyncThunk(
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
-    const data = await response.json();
-    return {data, status:response.status}; // This should be the user data
+     const data = await response.json();
+
+     localStorage.setItem("token", data.token);
+
+     return data.user;
   }
 );
 

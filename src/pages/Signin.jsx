@@ -1,35 +1,41 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { loginUser } from "../redux-toolkit/accountSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
-function Signin() {
+const Signin = () => {
   const dispatch = useDispatch();
-  const { isLoading, isError, error } = useSelector(
-    (state) => state
-  );
+  const { isLoading, isError, error } = useSelector((state) => state.account);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const initialValues = {
+    email: "",
+    password: "",
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(loginUser(formData)).then((result) => {
-      if (result.payload.status == 200)
-      {
-        toast.success("Login Successfully");
-      }
-      else
-      {
-        toast.error(result.payload.message);
-      }
-      navigate('/')
-    });
-    setFormData({ email: "", password: "" });
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters long")
+      .required("Password is required"),
+  });
+
+  const handleSubmit = (values, { setSubmitting }) => {
+    dispatch(loginUser(values))
+      .unwrap()
+      .then((user) => {
+        toast.success("Login successful!");
+        navigate("/");
+      })
+      .catch((error) => {
+        toast.error(`Login failed: ${error}`);
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -40,49 +46,64 @@ function Signin() {
         </h2>
         {isLoading && <p className="text-center text-blue-500">Loading...</p>}
         {isError && <p className="text-center text-red-500">Error: {error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-          <button
-            className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors duration-300"
-            type="submit"
-          >
-            Login
-          </button>
-        </form>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="email"
+                >
+                  Email
+                </label>
+                <Field
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+              <div className="mb-6">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="password"
+                >
+                  Password
+                </label>
+                <Field
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                />
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+              <button
+                className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors duration-300"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                Login
+              </button>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );
-}
+};
 
 export default Signin;
