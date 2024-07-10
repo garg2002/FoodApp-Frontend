@@ -3,19 +3,21 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { CiSearch, CiLocationOn } from "react-icons/ci";
 import { CgProfile } from "react-icons/cg";
-import { fetchCart } from "../redux-toolkit/cartSlice";
 import { SlHandbag } from "react-icons/sl";
 import { IoHelpBuoyOutline } from "react-icons/io5";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Logo from "../assets/Logo.png";
+import { logoutUser } from "../redux-toolkit/accountSlice";
+import { fetchCart } from "../redux-toolkit/cartSlice";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { items } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const user = JSON.parse(localStorage.getItem('user'));
+  console.log("User-------", user);
 
   useEffect(() => {
-    // Fetch cart items on component mount
     dispatch(fetchCart());
   }, [dispatch]);
 
@@ -23,114 +25,168 @@ const Navbar = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const handleLogout = () => {
+     dispatch(logoutUser()).then(() => {
+       window.location.reload();
+     }); 
+  };
+
   return (
-    <div className="shadow-xl bg-white max-w h-20 max-h w-full font-serif text-md md:text-xl p-2 flex items-center justify-between md:justify-evenly">
+    <div className="shadow-xl bg-white h-20 flex items-center justify-between px-4 font-medium  md:px-8 text-gray-600">
       {/* Logo & Location */}
       <div className="flex items-center">
         <Link to="/" className="flex items-center">
           <img
             src={Logo}
             alt="TastyTrail"
-            className="w-24 md:w-32 h-20 md:h-20 "
+            className="w-24 h-20 md:w-32 md:h-20"
           />
         </Link>
-        <div className="hidden md:flex flex-col">
-          <div className="mt-2 ml-6">
-            <label className="flex">
-              <CiLocationOn />
-              <select
-                name="selectedFruit"
-                className="outline-none font-[550] hover:text-blue-500"
-              >
-                <option value="indore">Indore</option>
-                <option value="pune">Pune</option>
-                <option value="delhi">Delhi</option>
-                <option value="mumbai">Mumbai</option>
-                <option value="banglore">Bangalore</option>
-              </select>
-            </label>
-          </div>
+        <div className="hidden md:flex flex-col ml-4">
+          <label className="flex items-center">
+            <CiLocationOn className="text-gray-600 text-xl" />
+            <select
+              name="selectedFruit"
+              className="ml-2 outline-none text-gray-800 text-sm hover:text-blue-500"
+            >
+              <option value="indore">Indore</option>
+              <option value="pune">Pune</option>
+              <option value="delhi">Delhi</option>
+              <option value="mumbai">Mumbai</option>
+              <option value="bangalore">Bangalore</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      {/* Hamburger Icon */}
-      <div className="md:hidden flex items-center">
+      {/* Hamburger Icon for Mobile */}
+      <div className="flex items-center md:hidden">
         <button onClick={toggleMenu}>
           {menuOpen ? (
-            <FaTimes className="text-2xl" />
+            <FaTimes className="text-2xl text-gray-800" />
           ) : (
-            <FaBars className="text-2xl" />
+            <FaBars className="text-2xl text-gray-800" />
           )}
         </button>
       </div>
 
-      {/* SearchBar */}
-      <Link to="/search" className="hidden md:flex cursor-pointer font-[550]">
-        <span>
-          <CiSearch className="md:text-2xl text-gray-800 font-[550] w-4 md:w-12 mt-1" />
-        </span>
-        <p>Search</p>
+      {/* Search Bar */}
+      <Link
+        to="/search"
+        className="hidden md:flex items-center text-gray-800 hover:text-blue-500"
+      >
+        <CiSearch className="text-2xl mr-1" />
+        <span className="text-sm">Search</span>
       </Link>
 
-      {/* Login, Help & Cart */}
-      <div className="hidden md:flex w-1/3 font-[550] justify-around">
-        <div className="lg:flex w-24 h-14 gap-3 hidden hover:text-blue-500">
-          <span>
-            <IoHelpBuoyOutline className="mt-4 text-2xl" />
-          </span>
-          <button>Help</button>
-        </div>
-        <Link to="/cart" className="flex w-24 h-14 gap-3 hover:text-blue-500">
-          <span className="flex justify-center ">
-            <SlHandbag className="mt-4 text-2xl" />
-            {items.length > 0 && (
-              <p className=" h-5  rounded-full w-5 text-[#1a8cff]">{items.length}</p>
-            )}
-          </span>
-          <button>Cart</button>
-        </Link>
+      {/* Help, Cart, Profile, Login/Logout */}
+      <div className="hidden md:flex items-center space-x-4 ml-auto">
         <Link
-          to={`/login`}
-          className="flex w-24 h-14 gap-3 hover:text-blue-500"
+          to="/help"
+          className="flex items-center text-gray-800 hover:text-blue-500"
         >
-          <span>
-            <CgProfile className="mt-4 text-2xl" />
-          </span>
-          <button>Login</button>
+          <IoHelpBuoyOutline className="text-2xl" />
+          <span className="ml-1 text-sm">Help</span>
         </Link>
+
+        <Link
+          to="/cart"
+          className="flex items-center text-gray-800 hover:text-blue-500"
+        >
+          <SlHandbag className="text-2xl" />
+          <span className="ml-1 text-sm">Cart</span>
+          {items.length > 0 && (
+            <span className="ml-1 text-[#1a8cff] rounded-full bg-gray-200 px-2 py-1 text-xs">
+              {items.length}
+            </span>
+          )}
+        </Link>
+
+        {user  ? (
+          <>
+            <Link
+              to={`/profile`}
+              className="flex items-center text-gray-800 hover:text-blue-500"
+            >
+              <CgProfile className="text-2xl" />
+              <span className="ml-1 text-sm">Profile</span>
+            </Link>
+            <button
+              className="flex items-center py-1 px-1 w-16 rounded-md font-medium hover:bg-red-500 hover:text-white"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link
+            to={`/login`}
+            className="flex  items-center  py-1 px-1 w-16 rounded-md font-medium hover:bg-red-500 hover:text-white"
+          >
+            <CgProfile className="text-2xl" />
+            <span className="ml-1 text-sm">Login</span>
+          </Link>
+        )}
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden absolute w-60 top-20 right-0 bg-white shadow-lg z-10 flex flex-col items-center">
+        <div className="md:hidden absolute top-20 right-0 w-64 pl-8 bg-white shadow-lg z-10 flex flex-col">
           <Link
             to="/search"
-            className="flex cursor-pointer font-[550] py-2"
+            className="flex items-center text-gray-800 hover:text-blue-500 py-2"
             onClick={toggleMenu}
           >
-            <CiSearch className="text-2xl text-gray-800 font-[550] w-12 mt-1" />
-            <p>Search</p>
+            <CiSearch className="text-2xl mr-1" />
+            <span className="text-sm">Search</span>
           </Link>
           <Link
             to="/cart"
-            className="flex w-24 h-14 gap-3 hover:text-blue-500 py-2"
+            className="flex items-center text-gray-800 hover:text-blue-500 py-2"
             onClick={toggleMenu}
           >
-            <SlHandbag className="mt-4 text-2xl" />
-            <button>Cart</button>
+            <SlHandbag className="text-2xl" />
+            <span className="ml-1 text-sm">Cart</span>
           </Link>
           <Link
-            to="/login"
-            className="flex w-24 h-14 gap-3 hover:text-blue-500 py-2"
+            to="/help"
+            className="flex items-center text-gray-800 hover:text-blue-500 py-2"
             onClick={toggleMenu}
           >
-            <CgProfile className="mt-4 text-2xl" />
-            <button>Login</button>
+            <IoHelpBuoyOutline className="text-2xl" />
+            <span className="ml-1 text-sm">Help</span>
           </Link>
-          <div className="flex w-24 h-14 gap-3 hover:text-blue-500 py-2">
-            <IoHelpBuoyOutline className="mt-4 text-2xl" />
-            <button>Help</button>
-          </div>
+          {user ? (
+            <>
+              <Link
+                to={`/profile`}
+                className="flex items-center text-gray-800 hover:text-blue-500 py-2"
+                onClick={toggleMenu}
+              >
+                <CgProfile className="text-2xl" />
+                <span className="ml-1 text-sm">Profile</span>
+              </Link>
+
+              <button
+                className="flex border-2 border-yellow-500 items-center mb-4 py-1 px-1 w-16 rounded-md font-medium hover:bg-red-500 hover:text-white"
+                onClick={() => {
+                  handleLogout();
+                  toggleMenu();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center text-gray-800 hover:text-blue-500 py-2"
+              onClick={toggleMenu}
+            >
+              <CgProfile className="text-2xl" />
+              <span className="ml-1 text-sm">Login</span>
+            </Link>
+          )}
         </div>
       )}
     </div>

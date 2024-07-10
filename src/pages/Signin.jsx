@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { loginUser } from "../redux-toolkit/accountSlice";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -31,6 +31,7 @@ const Signin = () => {
       .then((user) => {
         toast.success("Login successful!");
         navigate("/");
+        window.location.reload();
       })
       .catch((error) => {
         toast.error(`Login failed: ${error}`);
@@ -101,6 +102,12 @@ const Signin = () => {
             </Form>
           )}
         </Formik>
+        <p className="mt-4 text-center text-gray-600">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-indigo-500 hover:underline">
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   );

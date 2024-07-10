@@ -3,10 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { registerUser } from "../redux-toolkit/accountSlice";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.account);
+  const navigate = useNavigate();
+  const { loading, error, user } = useSelector((state) => state.account);
+  console.log("userRegister:--------",user);
 
   const initialValues = {
     first_name: "",
@@ -23,17 +28,21 @@ const Register = () => {
       .email("Invalid email format")
       .required("Email is required"),
     mobile_no: Yup.string()
-      .required("phone number is required")
+      .required("Phone number is required")
       .matches(/^[0-9]+$/, "Phone number must be digits only"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters long")
       .required("Password is required"),
   });
 
-  const handleSubmit = (values, { resetForm }) => {
-    console.log("Values------------", values);
-    
-    dispatch(registerUser(values));
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      await dispatch(registerUser(values)).unwrap();
+      toast.success("Registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+    }
     resetForm();
   };
 
@@ -114,7 +123,7 @@ const Register = () => {
                   className="block text-gray-700 text-sm font-bold mb-2"
                   htmlFor="mobile_no"
                 >
-                Phone Number
+                  Phone Number
                 </label>
                 <Field
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
@@ -157,6 +166,7 @@ const Register = () => {
             </Form>
           )}
         </Formik>
+        <ToastContainer />
       </div>
     </div>
   );

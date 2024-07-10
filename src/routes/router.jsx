@@ -7,6 +7,7 @@ import RestaurantsDetail from "../pages/RestaurantsDetail";
 import Signin from "../pages/Signin";
 import SignUp from "../pages/SignUp";
 import Cart from "../pages/Cart";
+import UserProfile from "../pages/UserProfile";
 
 const routes = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const routes = createBrowserRouter([
       {
         path: "/cart",
         element: <Cart />,
+      },
+      {
+        path: "/profile",
+        element: <UserProfile />
       }
     ],
   },

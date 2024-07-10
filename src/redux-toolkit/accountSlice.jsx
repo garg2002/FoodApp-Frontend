@@ -15,11 +15,10 @@ export const loginUser = createAsyncThunk(
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
-     const data = await response.json();
-
-     localStorage.setItem("token", data.token);
-
-     return data.user;
+    const data = await response.json();
+    const { email, token, message } = data;
+    localStorage.setItem("token", token);
+    return {email,message};
   }
 );
 
@@ -41,6 +40,24 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+// Add logout action
+export const logoutUser = createAsyncThunk("account/logout", async () => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${backendUrl}/user/logout/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(),
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  localStorage.removeItem("token");
+  return null; // or handle the logout response data
+});
+
 const accountSlice = createSlice({
   name: "account",
   initialState: {
@@ -61,6 +78,8 @@ const accountSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.user = action.payload;
+        console.log("userLogin", state.user);
+        localStorage.setItem("user", JSON.stringify(action.payload));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -73,14 +92,21 @@ const accountSlice = createSlice({
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        console.log("actionPayload:-", action.payload);
         state.isLoading = false;
         state.isError = false;
-        state.user = action.payload;
+        state.user = action.payload.data;
+        console.log("userRegister", state.user);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.error = action.error.message;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+
+        state.user = null;
+        localStorage.removeItem("user");
       });
   },
 });

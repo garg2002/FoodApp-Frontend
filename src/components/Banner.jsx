@@ -3,7 +3,7 @@ import BannerImage from "../assets/BannerImage.png"
 
 const Banner = () => {
   return (
-    <div className="w-full flex bg-gradient-to-r from-[#edeff3] to-[#f3f6f3] md:flex-col lg:flex-row gap-2 items-center justify-center p-4">
+    <div className="w-full flex bg-gradient-to-r from-[#edeff3] to-[#f3f6f3]  md:flex-row gap-2 items-center justify-center p-4">
       {/* Content */}
       <div className="w-full lg:w-2/4 h-full flex flex-col items-center lg:items-start justify-center md:text-4xl text-2xl lg:text-5xl font-serif capitalize ml-12">
         <div>
