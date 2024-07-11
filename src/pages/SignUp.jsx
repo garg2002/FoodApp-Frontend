@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -7,11 +7,11 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
-const Register = () => {
+const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, user } = useSelector((state) => state.account);
-  console.log("userRegister:--------",user);
+  console.log("userRegister:--------", user);
 
   const initialValues = {
     first_name: "",
@@ -19,6 +19,7 @@ const Register = () => {
     email: "",
     mobile_no: "",
     password: "",
+    profileImg: null,
   };
 
   const validationSchema = Yup.object({
@@ -33,11 +34,49 @@ const Register = () => {
     password: Yup.string()
       .min(6, "Password must be at least 6 characters long")
       .required("Password is required"),
+    profileImg: Yup.mixed().test("fileSize", "File size too large", (value) => {
+        if (!value) return true; // allow empty values
+        return value.size <= 1024 * 1024 * 2; // 2MB limit
+      })
+      .test("fileType", "Unsupported file type", (value) => {
+        if (!value) return true; // allow empty values
+        return ["image/jpeg", "image/png", "image/jpg"].includes(value.type);
+      })
+      .required("Image is required"),
   });
+
+  const handleSubmitImage = async (image) => {
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "userImage");
+    data.append("cloud_name", "dxeqwilsn");
+
+    console.log("data: ", data);
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dxeqwilsn/image/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      const result = await response.json();
+      console.log("result: ", result.url);
+      return result.url;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
+  };
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      await dispatch(registerUser(values)).unwrap();
+      const imageUrl = await handleSubmitImage(values.profileImg);
+      const userData = { ...values, profileImg: imageUrl };
+      console.log(userData);
+      await dispatch(registerUser(userData)).unwrap();
       toast.success("Registered successfully!");
       navigate("/login");
     } catch (err) {
@@ -59,8 +98,8 @@ const Register = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
-            <Form>
+          {({ isSubmitting, setFieldValue }) => (
+            <Form encType="multipart/form-data">
               <div className="mb-4">
                 <label
                   className="block text-gray-700 text-sm font-bold mb-2"
@@ -156,6 +195,28 @@ const Register = () => {
                   className="text-red-500 text-sm"
                 />
               </div>
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="profileImg"
+                >
+                  Upload Image
+                </label>
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                  type="file"
+                  accept="image/*"
+                  name="profileImg"
+                  onChange={(e) =>
+                    setFieldValue("profileImg", e.target.files[0])
+                  }
+                />
+                <ErrorMessage
+                  name="profileImg"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
               <button
                 className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors duration-300"
                 type="submit"
@@ -172,4 +233,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default SignUp;

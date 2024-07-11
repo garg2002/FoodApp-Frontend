@@ -9,12 +9,14 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import Logo from "../assets/Logo.png";
 import { logoutUser } from "../redux-toolkit/accountSlice";
 import { fetchCart } from "../redux-toolkit/cartSlice";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { items } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
   console.log("User-------", user);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const Navbar = () => {
   const handleLogout = () => {
      dispatch(logoutUser()).then(() => {
        window.location.reload();
+       navigate('/')
      }); 
   };
 

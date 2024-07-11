@@ -92,6 +92,17 @@ const Signin = () => {
                   className="text-red-500 text-sm"
                 />
               </div>
+              <div>
+                <p className=" mb-4 text-end text-gray-600">
+                  
+                  <Link
+                    to="/forgetPassword"
+                    className="text-indigo-500 hover:underline"
+                  >
+                    Forget Password?
+                  </Link>
+                </p>
+              </div>
               <button
                 className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors duration-300"
                 type="submit"

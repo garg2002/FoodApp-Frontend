@@ -8,7 +8,8 @@ import Signin from "../pages/Signin";
 import SignUp from "../pages/SignUp";
 import Cart from "../pages/Cart";
 import UserProfile from "../pages/UserProfile";
-
+import ForgetPassword from "../components/ForgetPassword";
+import NewPassword from "../components/NewPassword";
 const routes = createBrowserRouter([
   {
     path: "/",
@@ -45,6 +46,14 @@ const routes = createBrowserRouter([
       {
         path: "/profile",
         element: <UserProfile />
+      },
+      {
+        path: "/forgetPassword",
+        element: <ForgetPassword/>
+      },
+      {
+        path: "/new-password",
+        element: <NewPassword/>
       }
     ],
   },

@@ -13,7 +13,7 @@ const TrendingFood = () => {
 
   return (
     <>
-      {restaurants.isLoading ? (
+      {restaurants?.isLoading ? (
         <Loader />
       ) : (
         <div className="w-full h-full p-4">
@@ -23,7 +23,7 @@ const TrendingFood = () => {
             </h1>
             <div className="mt-2 w-full h-full bg-[#ffffff] overflow-x-auto hide-scrollbar mb-8">
               <div className="flex space-x-6 place-items-center w-full h-full">
-                {restaurants.map((product) => {
+                {restaurants?.results?.map((product) => {
                   return (
                     <Link to={`/restaurants/${product?.id}`} key={product?.id}>
                       <div className=" md:w-[300px] w-[220px] cursor-pointer bg-white object-scale-down shadow-stone-400 rounded-md mt-4 p-0 transform transition-transform duration-400 hover:scale-90">
