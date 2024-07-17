@@ -3,13 +3,13 @@ import Home from "../pages/Home";
 import SearchItem from "../components/SearchItem";
 import App from "../App";
 import FoodCategory from "../components/FoodCategory";
-import RestaurantsDetail from "../pages/RestaurantsDetail";
+// import RestaurantsDetail from "../pages/RestaurantsDetail";
 import Signin from "../pages/Signin";
 import SignUp from "../pages/SignUp";
 import Cart from "../pages/Cart";
 import UserProfile from "../pages/UserProfile";
 import ForgetPassword from "../components/ForgetPassword";
-import NewPassword from "../components/NewPassword";
+import CheckoutForm from "../pages/CheckoutForm";
 const routes = createBrowserRouter([
   {
     path: "/",
@@ -27,10 +27,10 @@ const routes = createBrowserRouter([
         path: "/category/:id/",
         element: <FoodCategory />,
       },
-      {
-        path: "/restaurants/:id/",
-        element: <RestaurantsDetail />,
-      },
+      // {
+      //   path: "/restaurants/:id/",
+      //   element: <RestaurantsDetail />,
+      // },
       {
         path: "/login",
         element: <Signin />,
@@ -52,9 +52,10 @@ const routes = createBrowserRouter([
         element: <ForgetPassword/>
       },
       {
-        path: "/new-password",
-        element: <NewPassword/>
+        path: "/checkoutForm",
+        element: <CheckoutForm />
       }
+    
     ],
   },
 ]);

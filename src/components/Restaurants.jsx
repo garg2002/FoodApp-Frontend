@@ -8,56 +8,67 @@ const Restaurants = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchRestaurants(page);
-  }, [page]);
-
-  const fetchRestaurants = async (page) => {
+  const fetchRestaurants = async (currentPage) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://192.168.1.10:8000/restaurants/restaurants/?page=${page}`
+        `http://192.168.1.32:8000/restaurants/restaurants/?page=${currentPage}`
       );
       const data = response.data;
-      setDisplayedRestaurants((prev) => [...prev, ...data.results]);
+      if (data.results.length === 0) {
+        setHasMore(false); // No more pages to fetch
+      } else {
+        let counts = data.count;
+        console.log(data.results.length);
+        let ttlpge = Math.ceil(counts / data.results.length);
+        console.log("totalPAges-------",ttlpge );
+
+        setTotalPages(ttlpge); // Update total pages based on API response
+        setDisplayedRestaurants((prev) => [...prev, ...data.results]);
+      }
     } catch (error) {
       console.error("Error fetching restaurants:", error);
+      setHasMore(false); // Set hasMore to false on error to stop further fetching
     }
     setLoading(false);
     setIsInitialLoading(false);
   };
 
+  useEffect(() => {
+    fetchRestaurants(page);
+  }, [page]);
 
   const handleScroll = () => {
-    try {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-          document.documentElement.scrollHeight
-      ) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    } catch (error) {
-      console.log(error);
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.scrollHeight - 1 &&
+      !loading &&
+      hasMore &&
+      page < totalPages // Ensure we don't exceed the total pages
+    ) {
+      setPage((prevPage) => prevPage + 1);
     }
   };
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [loading]);
+  }, [loading, hasMore, totalPages]);
 
   return (
     <>
       {isInitialLoading ? (
         <Loader />
       ) : (
-        <div className="w-full h-full p-4">
-          <h1 className="text-slate-900 text-2xl md:text-3xl md:ml-16 font-extrabold mb-6">
+        <div className="w-full h-full px-4 ">
+          <h1 className="text-slate-900 text-2xl md:text-3xl md:mx-16 font-extrabold mb-6">
             Best Restaurants for online delivery
           </h1>
-          <div className="mt-2 w-full h-full bg-[#ffffff] mb-8">
-            <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 place-items-center w-full h-full">
+          <div className="mt-2 w-full h-full mx-[16px] bg-[#ffffff] mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {displayedRestaurants.map((product) => (
                 <Link to={`/restaurants/${product?.id}/`} key={product?.id}>
                   <div className="md:w-[300px] w-[220px] cursor-pointer bg-white shadow-stone-400 rounded-md mt-4 p-0 transform transition-transform duration-400 hover:scale-90">
@@ -99,8 +110,7 @@ const Restaurants = () => {
               ))}
             </div>
           </div>
-          {loading && <Loader/>}
-        
+          {loading && <Loader />}
         </div>
       )}
     </>
@@ -108,3 +118,4 @@ const Restaurants = () => {
 };
 
 export default Restaurants;
+

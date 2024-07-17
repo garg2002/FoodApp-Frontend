@@ -11,7 +11,6 @@ const Carousel = () => {
     dispatch(productsData());
   }, []);
 
-  console.log("productsData:----", products);
 
   return (
     <>

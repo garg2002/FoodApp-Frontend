@@ -1,36 +1,77 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCart, removeFromCart } from "../redux-toolkit/cartSlice";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import CheckoutForm from "./CheckoutForm";
+
+const stripePromise = loadStripe(
+  "pk_test_51PbgshRohX98q0M7ZGVvXqaURKXdX0bdOWcusBu6npNh3JewajbsOgIK2pz8pZ9pNRHVupESK6lWbeWiCcPr0Vdk00BpyBfg6T"
+);
 
 const Cart = () => {
   const dispatch = useDispatch();
   const { items, status, error } = useSelector((state) => state.cart);
+  const [clientSecret, setClientSecret] = useState("");
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [calculateTotalAmount, setCalculateTotalAmount] = useState(0);
 
-
+  useEffect(() => {
+    const totalAmount = items.reduce(
+      (total, item) => total + item?.product?.price * item?.quantity,
+      0
+    );
+    setCalculateTotalAmount(totalAmount);
+  }, [items]);
 
   const handleRemoveFromCart = (productId) => {
-  console.log("productId-----", productId);
-
     dispatch(removeFromCart(productId));
   };
-    useEffect(() => {
-      dispatch(fetchCart());
-    }, [dispatch]);
 
-  console.log("itemsData-----", items);
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(
+        "http://192.168.1.32:8000/payment/Checkout/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: calculateTotalAmount,
+            currency: "inr",
+            payment_method_types: ["card"],
+          }),
+        }
+      );
+      const data = await response.json();
+      setClientSecret(data.clientSecret);
+      setShowCheckout(true);
+    } catch (error) {
+      console.error("Error fetching client_secret:", error);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   return (
     <div className="relative min-w-full bg-gray-100 p-8">
       <div className="bg-white shadow-xl rounded-lg p-6 flex flex-col md:flex-row">
-        <div className="w-full md:w-3/4 h-full">
+        <div className="w-full md:w-2/3 h-full">
           <div className="flex items-center justify-between mb-4 border-b pb-4">
             <h2 className="text-2xl font-bold text-gray-800">Shopping Cart</h2>
           </div>
           <div className="overflow-y-auto h-[455px] px-10">
             {status === "loading" && <p>Loading...</p>}
-            {status === "failed" && (<p>
-              Error: {typeof error === "string" ? error : JSON.stringify(error)}
-            </p>)}
+            {status === "failed" && (
+              <p>
+                Error:{" "}
+                {typeof error === "string" ? error : JSON.stringify(error)}
+              </p>
+            )}
             {items?.length === 0 ? (
               <div className="text-center">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -69,9 +110,7 @@ const Cart = () => {
                           <button
                             type="button"
                             className="font-medium text-red-600 hover:text-red-500"
-                            onClick={() =>
-                              handleRemoveFromCart(product?.id)
-                            }
+                            onClick={() => handleRemoveFromCart(product?.id)}
                           >
                             Remove
                           </button>
@@ -89,25 +128,25 @@ const Cart = () => {
           <div className="pt-6">
             <div className="flex justify-between text-xl font-medium text-gray-900">
               <p>Subtotal</p>
-              <p>
-                ₹
-                {items?.reduce(
-                  (total, item) =>
-                    total + item?.product?.price * item?.quantity,
-                  0
-                )}
-              </p>
+              <p>₹{calculateTotalAmount}</p>
             </div>
             <p className="mt-0.5 text-sm text-gray-500">
-              Shipping and taxes calculated at checkout.
+              Shipping and taxes charges are Free.
             </p>
             <div className="mt-6">
-              <a
-                href="#"
-                className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-              >
-                Checkout
-              </a>
+              {!showCheckout && (
+                <button
+                  onClick={handleCheckout}
+                  className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                >
+                  Checkout
+                </button>
+              )}
+              {showCheckout && (
+                <Elements stripe={stripePromise}>
+                  <CheckoutForm clientSecret={clientSecret} />
+                </Elements>
+              )}
             </div>
           </div>
         </div>

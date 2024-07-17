@@ -56,31 +56,6 @@ export const fetchCart = createAsyncThunk(
 );
 
 // Async thunk action to remove an item from the cart
-// export const removeFromCart = createAsyncThunk(
-//   "cart/removeFromCart",
-//   async (productId, { rejectWithValue }) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       if (!token) {
-//         throw new Error("No token available");
-//       }
-
-//       const response = await axios.delete(
-//         `${backendUrl}/user/cart/${productId}/`,
-//         {
-//           headers: {
-//             Authorization: `Token ${token}`,
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-
-//       return productId;
-//     } catch (error) {
-//       return rejectWithValue(error.response.data);
-//     }
-//   }
-// );
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (productId, { rejectWithValue }) => {
@@ -104,21 +79,41 @@ export const removeFromCart = createAsyncThunk(
   }
 );
 
+// Async thunk action to clear the cart
+export const clearCart = createAsyncThunk(
+  "cart/clearCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token available");
+      }
+
+      // Make DELETE request to clear cart
+      await axios.delete(`${backendUrl}/user/cart/delete_all/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      return; // No need to return data since the state is managed asynchronously
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Slice with initial state and reducers
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    items: [], // Array to hold cart items
-    status: "idle", // Status for async operations
-    error: null, // Error message holder
+    items: [],
+    status: "idle",
+    error: null,
   },
   reducers: {
-    clearCart: (state) => {
-      // Clear all items from cart
-      state.items = [];
-    },
     incrementQuantity: (state, action) => {
-      // Increment quantity of a specific item in the cart
       const { productId } = action.payload;
       const item = state.items.find((item) => item.product.id === productId);
       if (item) {
@@ -126,7 +121,6 @@ const cartSlice = createSlice({
       }
     },
     decrementQuantity: (state, action) => {
-      // Decrement quantity of a specific item in the cart (minimum quantity is 1)
       const { productId } = action.payload;
       const item = state.items.find((item) => item.product.id === productId);
       if (item && item.quantity > 1) {
@@ -141,7 +135,7 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items.push(action.payload); // Assuming payload contains added item data
+        state.items.push(action.payload);
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.status = "failed";
@@ -152,7 +146,7 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items = action.payload; // Assuming payload contains cart items
+        state.items = action.payload;
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.status = "failed";
@@ -163,19 +157,26 @@ const cartSlice = createSlice({
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Remove the item from the cart based on productId
-        state.items = state.items.filter(
-          (item) => item.id !== action.payload
-        );
+        state.items = state.items.filter((item) => item.id !== action.payload);
       })
       .addCase(removeFromCart.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(clearCart.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(clearCart.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.items = []; // Clear all items from cart
+      })
+      .addCase(clearCart.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });
   },
 });
 
-export const { clearCart, incrementQuantity, decrementQuantity } =
-  cartSlice.actions;
+export const { incrementQuantity, decrementQuantity } = cartSlice.actions;
 
 export default cartSlice.reducer;

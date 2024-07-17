@@ -1,14 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  sendOTP,
+  resendOTP,
+  resetPassword,
+  setTimer,
+  setTimerOn,
+} from "../redux-toolkit/forgetPasswordSlice";
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
-  const [timer, setTimer] = useState(60);
-  const [timerOn, setTimerOn] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
+  const dispatch = useDispatch();
+  const { otpSent, timer, timerOn, isLoading } = useSelector(
+    (state) => state.forgetPassword
+  );
 
   const initialValues = {
     email: "",
@@ -36,88 +44,35 @@ const ForgetPassword = () => {
   useEffect(() => {
     if (timerOn && timer > 0) {
       const interval = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
+        dispatch(setTimer(timer - 1));
       }, 1000);
 
       return () => clearInterval(interval);
     } else if (timer === 0) {
-      setTimerOn(false);
+      dispatch(setTimerOn(false));
     }
-  }, [timerOn, timer]);
-
-  const startTimer = () => {
-    setTimer(60);
-    setTimerOn(true);
-  };
+  }, [dispatch, timerOn, timer]);
 
   const handleGetOTP = (email) => {
-    fetch(`http://192.168.1.10:8000/user/password-reset/`, {
-      method: "POST",
-        headers: {
-        Authorization: `Token ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to send OTP");
-        }
-        return response.json();
-      })
-      .then(() => {
-        toast.success("OTP sent successfully");
-        setOtpSent(true);
-        startTimer();
-      })
-      .catch((error) => toast.error(error.message));
+    dispatch(sendOTP(email));
+    dispatch(setTimer(60));
+    dispatch(setTimerOn(true));
   };
 
   const handleResendOTP = (email) => {
-    fetch(`http://192.168.1.10:8000/user/password-reset/`, {
-      method: "POST",
-        headers: {
-        Authorization: `Token ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to resend OTP");
-        }
-        return response.json();
-      })
-      .then(() => {
-        toast.success("OTP Resent Successfully");
-        startTimer();
-      })
-      .catch((error) => toast.error(error.message));
+    dispatch(resendOTP(email));
+    dispatch(setTimer(60));
+    dispatch(setTimerOn(true));
   };
 
   const handleSubmit = (values, { setSubmitting }) => {
-    fetch(`http://192.168.1.10:8000/user/password-reset-confirm/`, {
-      method: "POST",
-        headers: {
-        Authorization: `Token ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Invalid OTP or other error");
-        }
-        return response.json();
-      })
-      .then(() => {
-        toast.success("Password changed successfully");
-        navigate("/");
-      })
-      .catch((error) => {
-        toast.error(error.message);
+    dispatch(resetPassword(values)).then((action) => {
+      if (resetPassword.fulfilled.match(action)) {
+        navigate("/login");
+      } else {
         setSubmitting(false);
-      });
+      }
+    });
   };
 
   return (
@@ -135,7 +90,7 @@ const ForgetPassword = () => {
             <Form>
               <div className="mb-4 flex justify-between items-center w-full">
                 <Field
-                  className="w-3/4 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none "
+                  className="w-3/4 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none"
                   type="email"
                   name="email"
                   placeholder="Email"
@@ -144,7 +99,7 @@ const ForgetPassword = () => {
                   type="button"
                   className="bg-indigo-500 w-1/4 text-white py-2 px-3 rounded-r-lg hover:bg-indigo-600 transition-colors duration-300"
                   onClick={() => handleGetOTP(values.email)}
-                  disabled={otpSent}
+                  disabled={otpSent || isLoading}
                 >
                   Get OTP
                 </button>
@@ -152,7 +107,7 @@ const ForgetPassword = () => {
               <ErrorMessage
                 name="email"
                 component="div"
-                className="text-red-500  text-sm m-2"
+                className="text-red-500 text-sm m-2"
               />
               {otpSent && (
                 <>
@@ -177,6 +132,7 @@ const ForgetPassword = () => {
                         type="button"
                         className="text-indigo-600 hover:text-indigo-800 text-xs mt-1"
                         onClick={() => handleResendOTP(values.email)}
+                        disabled={isLoading}
                       >
                         Resend OTP
                       </button>
@@ -213,7 +169,7 @@ const ForgetPassword = () => {
               <button
                 type="submit"
                 className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors duration-300"
-                disabled={isSubmitting || !otpSent}
+                disabled={isSubmitting || !otpSent || isLoading}
               >
                 Change Password
               </button>

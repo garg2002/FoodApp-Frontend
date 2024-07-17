@@ -10,7 +10,6 @@ const SearchItem = () => {
   const { products } = useSelector((state) => state.products);
   const SearchedData = products.filter((item) => item?.name.toLowerCase().includes(query.toLowerCase()));
 
-  console.log("SearchedData:----", SearchedData);
 
   return (
     <div className="w-full h-full py-4 ">
