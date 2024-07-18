@@ -42,7 +42,7 @@ const CheckoutForm = ({ clientSecret }) => {
       setPaymentError(null);
 
       // Send payment success status to backend
-      sendPaymentStatusToBackend("succeed");
+      // sendPaymentStatusToBackend("succeed");
 
       // Optionally clear cart and navigate to home
       dispatch(clearCart()).then(() => {
@@ -51,28 +51,28 @@ const CheckoutForm = ({ clientSecret }) => {
     }
   };
 
-  const sendPaymentStatusToBackend = async (status) => {
-    try {
-      const response = await fetch("http://192.168.1.10.:8000/payment/status/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${localStorage.getItem("token")}`, // Example for authorization header
-        },
-        body: JSON.stringify({ status }),
-      });
-      if (response.ok) {
-        console.log("Payment status sent to backend successfully.");
-        // Handle further actions on success
-      } else {
-        console.error("Failed to send payment status to backend.");
-        // Handle error case
-      }
-    } catch (error) {
-      console.error("Error sending payment status to backend:", error);
-      // Handle network or other errors
-    }
-  };
+  // const sendPaymentStatusToBackend = async (status) => {
+  //   try {
+  //     const response = await fetch("http://192.168.1.10.:8000/payment/status/", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Token ${localStorage.getItem("token")}`, // Example for authorization header
+  //       },
+  //       body: JSON.stringify({ status }),
+  //     });
+  //     if (response.ok) {
+  //       console.log("Payment status sent to backend successfully.");
+  //       // Handle further actions on success
+  //     } else {
+  //       console.error("Failed to send payment status to backend.");
+  //       // Handle error case
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending payment status to backend:", error);
+  //     // Handle network or other errors
+  //   }
+  // };
 
   if (paymentSuccess) {
     toast.success("Payment done successfully !", {
